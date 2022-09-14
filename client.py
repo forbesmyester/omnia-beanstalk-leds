@@ -95,13 +95,13 @@ def light_lighter(lock):
                 color = list(map(safe_str_to_int, v["COLOR"].split(" ")))
                 if len(color) != 3:
                     continue
-                status = v["STATUS"]
+                status = safe_str_to_int(v["STATUS"])
                 if status == 1:
                     color = list(map(str, color))
                 if status == 0:
                     color = ["0", "0", "0"]
                 if status != 0 and status != 1:
-                    status = abs(safe_str_to_int(status)) - 1
+                    status = abs(status) - 1
                     sin_in = 6.283 * (frame / 100) * status
                     color = list(map(lambda c: str(int(math.sin(sin_in) * (c / 2) + (c / 2))), color))
                 files[k].truncate(0)
