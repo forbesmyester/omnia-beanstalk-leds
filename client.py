@@ -2,6 +2,8 @@ import threading
 import math
 import greenstalk
 import time
+import os
+
 
 leds=(0,{})
 
@@ -14,7 +16,17 @@ def get_leds():
     return leds
 
 def message_getter(lock):
-    client = greenstalk.Client(("logo.lang.speechmarks.com", 11300), use="logo-status", watch="logo-status")
+    beanstalk_host = "localhost"
+    beanstalk_port = 11300
+    beanstalk_tube = "status"
+    if "OMNIA_BEANSTALK_LEDS_BEANSTALK_HOST" in os.environ:
+        beanstalk_host = os.environ["OMNIA_BEANSTALK_LEDS_BEANSTALK_HOST"]
+    if "OMNIA_BEANSTALK_LEDS_BEANSTALK_PORT" in os.environ:
+        beanstalk_port = os.environ["OMNIA_BEANSTALK_LEDS_BEANSTALK_PORT"]
+    if "OMNIA_BEANSTALK_LEDS_BEANSTALK_TUBE" in os.environ:
+        beanstalk_tube = os.environ["OMNIA_BEANSTALK_LEDS_BEANSTALK_TUBE"]
+    print("Listening on " + beanstalk_host + ":" + beanstalk_port + "/" + beanstalk_tube)
+    client = greenstalk.Client((beanstalk_host, int(beanstalk_port)), use=beanstalk_tube, watch=beanstalk_tube)
     iteration = 1
     while True:
         job = client.reserve()
@@ -52,15 +64,17 @@ def light_lighter(lock):
     sleep_time = 1/60;
     # sleep_time = 1;
 
-    ledconf = {
-        'usr1': { 'color': "usr1-color", 'autonomous': "usr1-autonomous", 'brightness': "usr1-brightness" },
-        'usr2': { 'color': "usr2-color", 'autonomous': "usr2-autonomous", 'brightness': "usr2-brightness" }
-    }
 
     ledconf = {
         'usr1': { 'color': '/sys/class/leds/omnia-led:user1/color', 'autonomous': "/sys/class/leds/omnia-led:user1/autonomous", 'brightness': "/sys/class/leds/omnia-led:user1/brightness" },
         'usr2': { 'color': '/sys/class/leds/omnia-led:user2/color', 'autonomous': "/sys/class/leds/omnia-led:user2/autonomous", 'brightness': "/sys/class/leds/omnia-led:user2/brightness" }
     }
+
+    if "OMNIA_BEANSTALK_LEDS_BEANSTALK_TEST_ONLY" in os.environ and os.environ["OMNIA_BEANSTALK_LEDS_BEANSTALK_TEST_ONLY"] == "1":
+        ledconf = {
+            'usr1': { 'color': "usr1-color", 'autonomous': "usr1-autonomous", 'brightness': "usr1-brightness" },
+            'usr2': { 'color': "usr2-color", 'autonomous': "usr2-autonomous", 'brightness': "usr2-brightness" }
+        }
 
     with open(ledconf["usr1"]["autonomous"], "w") as usr1, open(ledconf["usr2"]["autonomous"], "w") as usr2:
         usr1.write("0")
