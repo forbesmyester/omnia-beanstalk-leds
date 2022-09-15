@@ -21,6 +21,8 @@ You could also set the lights to be on/off and static:
 
 Which was done using the following message
 
+NOTE: B is not lit at all, this is bleed from A
+
 ```
 LED=usr1;STATUS=1;COLOR=0 255 0
 LED=usr2;STATUS=0;COLOR=0 0 255
@@ -42,6 +44,8 @@ Some languages want you to store configuration in files, sometimes this is usefu
  * `OMNIA_BEANSTALK_LEDS_BEANSTALK_PORT` - The port of your Beanstalkd server (default `11300` )
  * `OMNIA_BEANSTALK_LEDS_BEANSTALK_TUBE` - The tube where messages are placed (default `status` )
  * `OMNIA_BEANSTALK_LEDS_BEANSTALK_TEST_ONLY` - If "1" write LED settings to files instead of changing physical LEDS
+
+If you don't know anything about Environmental Variables, you can either run the `export` lines in [env](./env) on your command prompt or import them on mass via `. ./env`.
 
 ### Starting Omnia Beanstalk LEDs when your Omnia boots
 
